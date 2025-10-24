@@ -1,0 +1,6 @@
+{
+  "gridSize": 4,
+  "goal": 2048,
+  "animationSpeed": 120,
+  "theme": "light"
+}

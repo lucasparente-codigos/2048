@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048 Game</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <!-- Fonts opcionais: adicione link para /assets/fonts/ se custom -->
+    <link rel="icon" href="assets/icons/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <h1>2048</h1>
+        <div class="scores">
+            <div class="score">Pontuação: <span id="score">0</span></div>
+            <div class="best-score">Melhor: <span id="best-score">0</span></div>
+        </div>
+        <button id="restart">Novo Jogo</button>
+    </header>
+    <main>
+        <div class="game-container">
+            <div class="grid-container" id="grid-container"></div>
+            <div class="message" id="message"></div>
+        </div>
+    </main>
+    <!-- Scripts carregados em ordem: utils primeiro, depois módulos dependentes -->
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/storage.js"></script>
+    <script type="module" src="js/tile.js"></script>
+    <script type="module" src="js/board.js"></script>
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="js/input.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

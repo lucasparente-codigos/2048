@@ -1,0 +1,29 @@
+.tile.new {
+    animation: pop 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67) 0.05s both;
+    transform-origin: center;
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.tile.merge { /* Futuro: detect in render if value log2 %1 ==0 ? */
+    animation: merge-pop 0.4s ease-in-out;
+}
+
+@keyframes merge-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}

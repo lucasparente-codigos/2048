@@ -1,7 +1,24 @@
 import { logDebug } from './utils.js';
 
+// js/input.js - Substituir a função initInput
+
 export function initInput(game) {
-    // 1. Input de Teclado
+    let isProcessing = false;
+
+    const handleMove = async (direction) => {
+        if (isProcessing) return;
+        isProcessing = true;
+        
+        logDebug('Input:', direction);
+        game.move(direction);
+        
+        // Pequeno delay para evitar inputs múltiplos
+        setTimeout(() => {
+            isProcessing = false;
+        }, 100);
+    };
+
+    // Input de Teclado
     document.addEventListener('keydown', (e) => {
         let direction = null;
 
@@ -31,15 +48,15 @@ export function initInput(game) {
         }
 
         if (direction) {
-            e.preventDefault(); // Previne o scroll
-            logDebug('Input de Teclado:', direction);
-            game.move(direction);
+            e.preventDefault();
+            handleMove(direction);
         }
     });
 
-    // 2. Input de Touch (mantendo a lógica de swipe)
+    // Input de Touch
     const gridContainer = document.getElementById('grid-container');
     let startX, startY;
+    const minSwipeDistance = 30; // Distância mínima para considerar swipe
 
     gridContainer.addEventListener('touchstart', (e) => {
         startX = e.touches[0].clientX;
@@ -47,30 +64,32 @@ export function initInput(game) {
     }, { passive: true });
 
     gridContainer.addEventListener('touchmove', (e) => {
-        e.preventDefault(); // Previne scroll
+        e.preventDefault();
     }, { passive: false });
 
     gridContainer.addEventListener('touchend', (e) => {
         if (!startX || !startY) return;
+        
         const endX = e.changedTouches[0].clientX;
         const endY = e.changedTouches[0].clientY;
         const diffX = startX - endX;
         const diffY = startY - endY;
         
+        // Verifica se o movimento foi significativo
+        if (Math.abs(diffX) < minSwipeDistance && Math.abs(diffY) < minSwipeDistance) {
+            startX = startY = null;
+            return;
+        }
+        
         let direction = null;
         if (Math.abs(diffX) > Math.abs(diffY)) {
-            // Movimento Horizontal
-            if (diffX > 0) direction = 'left';
-            else direction = 'right';
+            direction = diffX > 0 ? 'left' : 'right';
         } else {
-            // Movimento Vertical
-            if (diffY > 0) direction = 'up';
-            else direction = 'down';
+            direction = diffY > 0 ? 'up' : 'down';
         }
 
         if (direction) {
-            logDebug('Input de Touch:', direction);
-            game.move(direction);
+            handleMove(direction);
         }
 
         startX = startY = null;

@@ -1,16 +1,10 @@
-.tile.new {
-    animation: pop 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67) 0.05s both;
-    transform-origin: center;
-}
+/* animations.css */
 
-@keyframes pop {
+/* Animação de Spawn (Nova Tile) */
+@keyframes tile-spawn {
     0% {
         transform: scale(0);
-        opacity: 0.5;
-    }
-    50% {
-        transform: scale(1.2);
-        opacity: 1;
+        opacity: 0;
     }
     100% {
         transform: scale(1);
@@ -18,12 +12,24 @@
     }
 }
 
-.tile.merge { /* Futuro: detect in render if value log2 %1 ==0 ? */
-    animation: merge-pop 0.4s ease-in-out;
+/* Animação de Fusão (Merge) */
+@keyframes tile-merge {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
-@keyframes merge-pop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+.tile.new {
+    animation: tile-spawn 0.2s ease-out;
+}
+
+.tile.merge {
+    animation: tile-merge 0.2s ease-in-out;
+    z-index: 2; /* Garante que a tile que está se fundindo fique por cima */
 }

@@ -31,46 +31,95 @@ export class Board {
 
     move(direction) {
         let moved = false;
-        // Rotaciona a grid logicamente para mover em uma direção sempre (ex: esquerda)
-        let rotatedGrid = this.rotateGrid(direction);
-        // Move todas tiles para esquerda na grid rotacionada
+        let scoreDelta = 0;
+
+        // 1. Rotaciona a grid para que o movimento seja sempre para a 'esquerda'
+        const rotationMap = {
+            'left': 0,
+            'up': 1,
+            'right': 2,
+            'down': 3
+        };
+        const rotations = rotationMap[direction] || 0;
+        let rotatedGrid = this._rotate(this.grid, rotations);
+
+        // 2. Processa as linhas (movimento para a esquerda)
         for (let r = 0; r < this.size; r++) {
-            const row = rotatedGrid[r].filter(tile => tile); // Remove nulls
+            // Filtra as tiles válidas (não nulas)
+            let row = rotatedGrid[r].filter(tile => tile);
+            
+            // Combinação (Merge)
             for (let c = 0; c < row.length - 1; c++) {
-                if (row[c].value === row[c + 1].value) {
+                if (row[c] && row[c + 1] && row[c].value === row[c + 1].value) {
                     // Merge
                     const mergedValue = row[c].merge(row[c + 1]);
-                    row[c + 1] = null; // Remove merged tile
+                    scoreDelta += mergedValue;
+                    
+                    row[c + 1] = null; // Remove merged tile da linha temporária
                     moved = true;
-                    // Atualize score via game.js
                 }
             }
-            // Slide para esquerda
-            const newRow = row.filter(tile => tile !== null);
+
+            // Remove as tiles marcadas e desliza
+            row = row.filter(tile => tile !== null);
+            
+            // Preenche com nulls no final
+            const newRow = [...row];
             while (newRow.length < this.size) newRow.push(null);
+            
+            // Verifica se houve movimento (comparação de valores para evitar falsos positivos)
+            // A verificação deve ser feita comparando a novaRow com a linha original antes do preenchimento
+            // Simplificando a verificação de movimento: se a nova linha for diferente da original, houve movimento.
+            const originalRowValues = rotatedGrid[r].map(t => t ? t.value : 0).join(',');
+            const newRowValues = newRow.map(t => t ? t.value : 0).join(',');
+            if (originalRowValues !== newRowValues) {
+                moved = true;
+            }
+
             rotatedGrid[r] = newRow;
-            if (newRow.join() !== rotatedGrid[r].join()) moved = true; // Simplificado
         }
-        // Desrotaciona
-        this.grid = this.unrotateGrid(rotatedGrid, direction);
-        // Atualiza posições das tiles e remove merged
-        this.tiles = this.tiles.filter(tile => !tile.mergedFrom);
+
+        // 3. Desrotaciona
+        this.grid = this._rotate(rotatedGrid, (4 - rotations) % 4);
+
+        // 4. Atualiza posições e remove tiles fundidas
+        this.tiles = this.tiles.filter(tile => {
+            // Mantém apenas as tiles que ainda estão na grid
+            for (let r = 0; r < this.size; r++) {
+                for (let c = 0; c < this.size; c++) {
+                    if (this.grid[r][c] === tile) return true;
+                }
+            }
+            return false;
+        });
+
         this.updateTilePositions();
+        
+        // 5. Spawn novo tile se houve movimento
         if (moved) {
-            this.addTile(); // Spawn novo tile
+            this.addTile();
         }
-        return moved;
+
+        return { moved, scoreDelta };
     }
 
-    rotateGrid(direction) {
-        // Implementação de rotação baseada em direction (up=90deg, etc.). Para simplicidade, defina funções para cada dir.
-        // Exemplo para left: no rotate. Para up: transpose + reverse columns, etc. (pesquise "2048 board rotation" para otimizar)
-        // Placeholder: retorne grid ajustada
-        return this.grid; // Expanda com lógica completa
-    }
-
-    unrotateGrid(grid, direction) {
-        return grid; // Inverso da rotação
+    // Helper para rotacionar a matriz (0: 0deg, 1: 90deg, 2: 180deg, 3: 270deg)
+    _rotate(grid, times) {
+        if (times === 0) return grid;
+        
+        let newGrid = grid;
+        for (let t = 0; t < times; t++) {
+            const size = this.size;
+            const rotated = Array.from({ length: size }, () => Array(size).fill(null));
+            for (let r = 0; r < size; r++) {
+                for (let c = 0; c < size; c++) {
+                    // Rotação 90 graus: new[c][size-1-r] = old[r][c]
+                    rotated[c][size - 1 - r] = newGrid[r][c];
+                }
+            }
+            newGrid = rotated;
+        }
+        return newGrid;
     }
 
     updateTilePositions() {

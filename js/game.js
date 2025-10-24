@@ -30,14 +30,21 @@ export class Game {
 
     move(direction) {
         if (this.gameOver) return;
-        const previousScore = this.score;
-        const moved = this.board.move(direction);
+        
+        // Board.move agora retorna { moved, scoreDelta }
+        const { moved, scoreDelta } = this.board.move(direction);
+
         if (moved) {
-            // Atualize score em merges (adicione lógica no board.move para retornar delta score)
-            // Ex: this.score += delta; 
-            this.updateScore();
+            // 1. Atualiza a pontuação
+            if (scoreDelta > 0) {
+                this.addScore(scoreDelta);
+            }
+
+            // 2. Renderiza o tabuleiro (com as novas posições e tiles)
             this.board.render(this.gridContainer); // Com animações via classes
-            if (this.board.hasWon()) {
+
+            // 3. Verifica condições de vitória/derrota
+            if (this.board.hasWon() && !this.won) { // Verifica se ganhou PELA PRIMEIRA VEZ
                 this.won = true;
                 this.showMessage('Você venceu! Continue para mais pontos.');
             }
@@ -64,10 +71,10 @@ export class Game {
         this.init();
     }
 
-    // Integre delta score do board aqui
     addScore(delta) {
         this.score += delta;
         this.updateScore();
+        // Atualiza o melhor score
         if (this.score > StorageManager.getBestScore()) {
             StorageManager.setBestScore(this.score);
             StorageManager.updateUI(this.bestScoreEl);

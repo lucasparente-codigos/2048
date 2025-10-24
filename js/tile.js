@@ -1,5 +1,9 @@
 import { getTileClass } from './utils.js';
 
+const TILE_SIZE_WITH_GAP = 112; // 100px (tamanho) + 12px (gap)
+const GAP_OFFSET = 12; // O offset inicial é o gap
+
+
 export class Tile {
     constructor(value, row, col) {
         this.value = value;
@@ -8,7 +12,7 @@ export class Tile {
         this.mergedFrom = null; // Para rastrear fusão
         this.element = null;
     }
-
+    
     createElement() {
         const div = document.createElement('div');
         div.className = getTileClass(this.value);
@@ -28,11 +32,16 @@ export class Tile {
         this.row = row;
         this.col = col;
         if (this.element) {
-            this.element.style.transform = `translate(calc(${col * 110}px + 10px), calc(${row * 110}px + 10px))`; // Ajuste para grid 4x4, gap/padding
+            // Novo cálculo: col * (tile + gap) + gap
+            const x = col * TILE_SIZE_WITH_GAP + GAP_OFFSET;
+            const y = row * TILE_SIZE_WITH_GAP + GAP_OFFSET;
+            
+            this.element.style.transform = `translate(${x}px, ${y}px)`;
             this.element.dataset.row = row;
             this.element.dataset.col = col;
         }
     }
+    
 
     merge(tile) {
         this.value += tile.value;
@@ -44,3 +53,4 @@ export class Tile {
         return this.value === other.value && this.row === other.row && this.col === other.col;
     }
 }
+

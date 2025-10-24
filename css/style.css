@@ -1,121 +1,163 @@
+/* style.css - Versão com Variáveis CSS e Estilos 2048 */
+
 :root {
-    --cell-size: 106px;
-    --gap: 15px;
-    --grid-padding: 15px;
+    /* Dimensões */
     --grid-size: 4;
-    --animation-speed: 0.2s;
+    --tile-size: 100px;
+    --tile-gap: 12px;
+    --border-radius: 6px;
+
+    /* Cores do Jogo */
+    --color-background: #faf8ef;
+    --color-grid: #bbada0;
+    --color-tile-empty: rgba(238, 228, 218, 0.35);
+    --color-text-light: #f9f6f2; /* Para tiles com valor >= 8 */
+    --color-text-dark: #776e65;  /* Para tiles com valor < 8 */
+
+    /* Cores das Tiles */
+    --color-2: #eee4da;
+    --color-4: #ede0c8;
+    --color-8: #f2b179;
+    --color-16: #f59563;
+    --color-32: #f67c5f;
+    --color-64: #f65e3b;
+    --color-128: #edcf72;
+    --color-256: #edcc61;
+    --color-512: #edc850;
+    --color-1024: #edc53f;
+    --color-2048: #edc22e;
+    --color-super: #3c3a32; /* Para tiles > 2048 */
 }
 
 body {
-    background: #faf8ef;
-    color: #776e65;
+    background-color: var(--color-background);
+    font-family: Arial, sans-serif;
+    color: var(--color-text-dark);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
     padding: 20px;
-    font-family: 'Clear Sans', Arial, sans-serif; /* Adicione font em assets se quiser */
 }
 
-header { text-align: center; margin-bottom: 20px; }
-
-h1 { font-size: clamp(40px, 10vw, 80px); color: #776e65; font-weight: bold; margin-bottom: 10px; }
-
-.scores {
+header {
     display: flex;
-    gap: 20px;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 500px;
     margin-bottom: 20px;
 }
 
-.score, .best-score {
-    background: #bbada0;
-    color: white;
-    padding: 15px 25px;
-    border-radius: 6px;
-    min-width: 120px;
-    text-align: center;
+h1 {
+    font-size: 60px;
     font-weight: bold;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    color: var(--color-text-dark);
+}
+
+.scores {
+    display: flex;
+    gap: 10px;
+}
+
+.score, .best-score {
+    background: var(--color-grid);
+    color: var(--color-text-light);
+    padding: 8px 15px;
+    border-radius: var(--border-radius);
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
 }
 
 #restart {
     background: #8f7a66;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 6px;
-    font-size: 18px;
+    color: var(--color-text-light);
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
     font-weight: bold;
     transition: background 0.2s;
 }
 
-#restart:hover { background: #9f8a76; }
+#restart:hover {
+    background: #9f8a76;
+}
 
-.game-container { position: relative; }
+/* Container do Jogo e Grade */
+.game-container {
+    position: relative;
+    margin-top: 20px;
+}
 
 .grid-container {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-size), var(--tile-size));
+    grid-template-rows: repeat(var(--grid-size), var(--tile-size));
+    gap: var(--tile-gap);
+    background: var(--color-grid);
+    padding: var(--tile-gap);
+    border-radius: var(--border-radius);
     position: relative;
-    width: calc(var(--grid-size) * var(--cell-size) + (var(--grid-size) - 1) * var(--gap) + 2 * var(--grid-padding));
-    height: calc(var(--grid-size) * var(--cell-size) + (var(--grid-size) - 1) * var(--gap) + 2 * var(--grid-padding));
-    background: #bbada0;
-    border-radius: 10px;
-    padding: var(--grid-padding);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    margin: 0 auto;
 }
 
+.tile-empty {
+    width: var(--tile-size);
+    height: var(--tile-size);
+    background: var(--color-tile-empty);
+    border-radius: var(--border-radius);
+}
+
+/* Estilo Base da Tile */
 .tile {
     position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: var(--tile-size);
+    height: var(--tile-size);
+    line-height: var(--tile-size);
+    text-align: center;
+    font-size: 35px;
     font-weight: bold;
-    border-radius: 6px;
-    font-size: clamp(20px, 3vw, 45px);
-    transition: left var(--animation-speed) ease-in-out, top var(--animation-speed) ease-in-out, transform var(--animation-speed) ease-in-out;
-    user-select: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    border-radius: var(--border-radius);
+    transition: transform 0.1s ease-out, background-color 0.1s ease-out, color 0.1s ease-out;
+    /* Posição inicial (ajustada por JS) */
+    transform: translate(0, 0); 
 }
 
-.tile-0 {
-    background: rgba(238, 228, 218, 0.35);
+/* Estilos de Cor das Tiles */
+.tile-2 { background: var(--color-2); color: var(--color-text-dark); font-size: 45px; }
+.tile-4 { background: var(--color-4); color: var(--color-text-dark); font-size: 45px; }
+.tile-8 { background: var(--color-8); color: var(--color-text-light); }
+.tile-16 { background: var(--color-16); color: var(--color-text-light); }
+.tile-32 { background: var(--color-32); color: var(--color-text-light); }
+.tile-64 { background: var(--color-64); color: var(--color-text-light); }
+.tile-128 { background: var(--color-128); color: var(--color-text-light); font-size: 35px; }
+.tile-256 { background: var(--color-256); color: var(--color-text-light); font-size: 35px; }
+.tile-512 { background: var(--color-512); color: var(--color-text-light); font-size: 35px; }
+.tile-1024 { background: var(--color-1024); color: var(--color-text-light); font-size: 25px; }
+.tile-2048 { background: var(--color-2048); color: var(--color-text-light); font-size: 25px; }
+
+/* Para tiles maiores que 2048 */
+.tile-4096, .tile-8192, .tile-16384 {
+    background: var(--color-super);
+    color: var(--color-text-light);
+    font-size: 20px;
 }
 
-/* Cores tiles (expandi para 4096) */
-.tile-2    { background: #eee4da; color: #776e65; }
-.tile-4    { background: #ede0c8; color: #776e65; }
-.tile-8    { background: #f2b179; color: #f9f6f2; }
-.tile-16   { background: #f59563; color: #f9f6f2; }
-.tile-32   { background: #f67c5f; color: #f9f6f2; }
-.tile-64   { background: #f65e3b; color: #f9f6f2; }
-.tile-128  { background: #edcf72; color: #f9f6f2; font-size: clamp(18px, 2.5vw, 35px); }
-.tile-256  { background: #edcc61; color: #f9f6f2; font-size: clamp(18px, 2.5vw, 35px); }
-.tile-512  { background: #edc850; color: #f9f6f2; font-size: clamp(18px, 2.5vw, 35px); }
-.tile-1024 { background: #edc53f; color: #f9f6f2; font-size: clamp(16px, 2vw, 30px); }
-.tile-2048 { background: #edc22e; color: #f9f6f2; font-size: clamp(16px, 2vw, 30px); }
-.tile-4096 { background: #ff6b35; color: #f9f6f2; font-size: clamp(16px, 2vw, 30px); }
-
+/* Mensagens de Fim de Jogo */
 .message {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(238, 228, 218, 0.95);
-    padding: 30px;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 24px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(238, 228, 218, 0.73);
+    color: var(--color-text-dark);
+    display: none; /* Controlado por JS */
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
     font-weight: bold;
-    display: none;
-    backdrop-filter: blur(10px);
-}
-
-@media (max-width: 600px) {
-    :root {
-        --cell-size: 70px;
-        --gap: 10px;
-        --grid-padding: 10px;
-    }
-    .scores { flex-direction: column; gap: 10px; }
+    text-align: center;
+    border-radius: var(--border-radius);
+    z-index: 10;
 }
